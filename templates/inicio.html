@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Organiza tus metas y registra tus ahorros.">
+    <title>Registro de ahorros | Inicio</title>
+    <link rel="stylesheet" href="/static/css/inicio.css">
+</head>
+<body>
+    <button class="menu-btn" type="button" aria-label="Abrir menú"
+        aria-controls="menu" aria-expanded="false" onclick="abrirMenu()">☰</button>
+    <div class="fondo" aria-hidden="true" onclick="cerrarMenu()"></div>
+
+    <div class="contenedor">
+        <aside class="menu" id="menu">
+            <div class="logo">Ahorra+</div>
+            <nav aria-label="Navegación principal">
+                <a href="/inicio" class="activo" aria-current="page">Inicio</a>
+                <a href="/panel">Panel de control</a>
+                <a href="#acciones">Registro de ahorros</a>
+                <a href="/perfil">Perfil</a>
+                
+<a href="/estadisticas" class="nav-link">
+    <span>▤</span>
+    <span>Estadísticas e historial</span>
+</a>
+
+            </nav>
+            <div class="pro">
+                <p>Organiza tus metas y avances</p>
+                <strong>Tu futuro empieza hoy</strong>
+            </div>
+            <a href="#" class="salir" id="btnCerrarSesion">↪ Cerrar sesión</a>
+        </aside>
+
+        <main class="contenido-inicio">
+            <section class="bienvenida" aria-labelledby="titulo-bienvenida">
+                <div class="texto">
+                    <h1 id="titulo-bienvenida">Tu ahorro</h1>
+                    <p>Planifica y cuida tus ahorros.</p>
+                    <a class="btn" href="#acciones">Ver mis opciones</a>
+                </div>
+                <div class="ilustracion" aria-hidden="true"></div>
+            </section>
+
+            <section id="acciones" aria-labelledby="titulo-acciones">
+                <h3 id="titulo-acciones">¿Qué quieres hacer con tus ahorros?</h3>
+                <p class="subtitulo-acciones">Elige una opción para organizar tu dinero.</p>
+
+                <div class="fila-tarjetas">
+                    <article class="tarjeta-ahorro" onclick="location.href='/panel#registrar'">
+                        <span class="icono-ahorro" aria-hidden="true">
+                            <svg viewBox="0 0 48 48">
+                                <path d="M10 20h28l-3 19H13l-3-19Z"/>
+                                <path d="M17 20c0-5 3-9 7-9s7 4 7 9M20 28h8M24 24v9"/>
+                                <path d="M18 16 14 12m16 4 4-4"/>
+                            </svg>
+                        </span>
+                        <strong>Registrar un ahorro</strong>
+                    </article>
+
+                    <article class="tarjeta-ahorro" onclick="location.href='/panel#meta'">
+                        <span class="icono-ahorro" aria-hidden="true">
+                            <svg viewBox="0 0 48 48">
+                                <circle cx="23" cy="25" r="15"/>
+                                <circle cx="23" cy="25" r="8"/>
+                                <circle cx="23" cy="25" r="2"/>
+                                <path d="m24 24 14-14m-7 0h7v7"/>
+                            </svg>
+                        </span>
+                        <strong>Crear una meta</strong>
+                    </article>
+
+                    <article class="tarjeta-ahorro" onclick="location.href='/panel#transacciones'">
+                        <span class="icono-ahorro" aria-hidden="true">
+                            <svg viewBox="0 0 48 48">
+                                <rect x="9" y="12" width="30" height="27" rx="4"/>
+                                <path d="M16 8v8m16-8v8M9 20h30m-22 7h5m5 0h4m-14 6h5m5 0h4"/>
+                            </svg>
+                        </span>
+                        <strong>Ver mi historial</strong>
+                    </article>
+
+                    <article class="tarjeta-ahorro" onclick="location.href='/ahorros#progreso'" role="link" tabindex="0"
+                        <span class="icono-ahorro" aria-hidden="true">
+                            <svg viewBox="0 0 48 48">
+                                <path d="M9 39V25h8v14m7 0V15h8v24m7 0V8h2v31H7"/>
+                                <path d="m10 19 9-7 7 3 11-9"/>
+                            </svg>
+                        </span>
+                        <strong>Revisar mi progreso</strong>
+                    </article>
+
+                 <article class="tarjeta-ahorro" onclick="location.href='/ahorros#emergencia'" role="link" tabindex="0">
+                        <span class="icono-ahorro" aria-hidden="true">
+                            <svg viewBox="0 0 48 48">
+                                <path d="M24 6 39 12v11c0 9-6 15-15 19C15 38 9 32 9 23V12l15-6Z"/>
+                                <path d="M24 15v17m-6-11h12m-9 0a3 3 0 1 0 6 0 3 3 0 0 0-6 0Z"/>
+                            </svg>
+                        </span>
+                        <strong>Fondo de emergencia</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section class="resumen-ahorros" aria-labelledby="titulo-resumen">
+                <h3 id="titulo-resumen">Tu plan de ahorro</h3>
+                <div class="lado-derecho">
+                    <article class="tarjeta-lateral">
+                        <h4>Próximo objetivo</h4>
+                        <p>Define una meta y ponle una fecha.</p>
+                    </article>
+                    <article class="tarjeta-lateral">
+                        <h4>Consejo de ahorro</h4>
+                        <p>Separa una cantidad fija cada semana.</p>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+
+        api("/api/perfil").then(p => {
+            document.getElementById("titulo-bienvenida").textContent = "Ahorros de " + p.nombre;
+        });
+    </script>
+</body>
+</html>

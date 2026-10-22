@@ -1,0 +1,1267 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahorra+ | Mi progreso y emergencias</title>
+
+    <style>
+        :root {
+            --fondo: #171315;
+            --tarjeta: #252124;
+            --tarjeta2: #30292d;
+            --coral: #ff625f;
+            --coral-claro: #ff8980;
+            --texto: #fff8f6;
+            --suave: #c7b9bd;
+            --borde: rgba(255, 105, 100, .24);
+            --verde: #7ee0b0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            min-height: 100vh;
+        }
+
+        button, input, select {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 245px minmax(0, 1fr);
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            padding: 30px 19px;
+            background: #201a1d;
+            border-right: 1px solid var(--borde);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        .logo {
+            font-size: 29px;
+            font-weight: 800;
+            letter-spacing: -.8px;
+        }
+
+        .logo span {
+            color: var(--coral);
+        }
+
+        .side-subtitle {
+            color: var(--suave);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .nav-title {
+            color: #a99a9e;
+            font-size: 11px;
+            letter-spacing: 1.5px;
+            margin: 10px 10px 12px;
+        }
+
+        .nav-link {
+            width: 100%;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #e9dfe2;
+            text-align: left;
+            padding: 13px 14px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: rgba(255, 98, 95, .13);
+            border-color: var(--borde);
+            color: var(--coral-claro);
+        }
+
+        .side-bottom {
+            margin-top: auto;
+        }
+
+        .side-note {
+            background: var(--tarjeta2);
+            border: 1px solid var(--borde);
+            padding: 17px;
+            border-radius: 15px;
+            color: var(--suave);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .main {
+            padding: 32px;
+            min-width: 0;
+            max-width: 1600px;
+            width: 100%;
+            margin: auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 26px;
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--coral-claro);
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 9px;
+        }
+
+        h1 {
+            font-size: clamp(27px, 3vw, 39px);
+            letter-spacing: -.8px;
+        }
+
+        h2 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        h3 {
+            font-size: 15px;
+        }
+
+        .subtitle {
+            color: var(--suave);
+            line-height: 1.6;
+            margin-top: 9px;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: 1px solid var(--borde);
+            border-radius: 11px;
+            padding: 11px 16px;
+            color: var(--texto);
+            background: var(--tarjeta2);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            border-color: var(--coral);
+        }
+
+        .btn-primary {
+            background: var(--coral);
+            color: #fff;
+            border-color: var(--coral);
+            font-weight: 700;
+        }
+
+        .btn-primary:hover {
+            background: #f45150;
+        }
+
+        .hero {
+            background: linear-gradient(115deg, #d94b40, #ff725e 70%, #f45b53);
+            border-radius: 22px;
+            padding: 30px;
+            margin-bottom: 27px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "↗";
+            position: absolute;
+            right: 35px;
+            top: -35px;
+            font-size: 190px;
+            color: rgba(255,255,255,.09);
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .hero h2 {
+            font-size: clamp(23px, 3vw, 32px);
+            max-width: 650px;
+        }
+
+        .hero p {
+            max-width: 650px;
+            color: #fff0ed;
+            line-height: 1.7;
+            margin: 10px 0 20px;
+            font-size: 14px;
+        }
+
+        .hero .btn {
+            background: #fff8f6;
+            color: #b9423e;
+            border: none;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section {
+            scroll-margin-top: 20px;
+            margin-bottom: 36px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 17px;
+        }
+
+        .section-heading p {
+            color: var(--suave);
+            font-size: 13px;
+            line-height: 1.6;
+            margin-top: 5px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 15px;
+            margin-bottom: 17px;
+        }
+
+        .stat, .card {
+            background: var(--tarjeta);
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 21px;
+            min-width: 0;
+        }
+
+        .stat-label {
+            color: var(--suave);
+            font-size: 13px;
+            margin-bottom: 13px;
+        }
+
+        .stat-value {
+            font-size: clamp(21px, 2.2vw, 29px);
+            font-weight: 750;
+            overflow-wrap: anywhere;
+        }
+
+        .stat-foot {
+            color: var(--suave);
+            font-size: 12px;
+            margin-top: 9px;
+        }
+
+        .accent {
+            color: var(--coral-claro);
+        }
+
+        .green {
+            color: var(--verde);
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) minmax(270px, .85fr);
+            gap: 17px;
+        }
+
+        .card-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 19px;
+        }
+
+        .card-heading p {
+            color: var(--suave);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 6px;
+        }
+
+        .pill {
+            color: var(--coral-claro);
+            background: rgba(255, 98, 95, .12);
+            border: 1px solid var(--borde);
+            padding: 6px 9px;
+            border-radius: 30px;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .chart-wrap {
+            width: 100%;
+            height: 250px;
+            position: relative;
+        }
+
+        #graficaProgreso {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 17px;
+            color: var(--suave);
+            font-size: 12px;
+            margin-top: 13px;
+        }
+
+        .legend span {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+            background: var(--coral);
+        }
+
+        .dot.gray {
+            background: #a99ca5;
+        }
+
+        .goal-amount {
+            font-size: 30px;
+            font-weight: 800;
+            margin: 12px 0 5px;
+            overflow-wrap: anywhere;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 11px;
+            background: #45373e;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 17px 0 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #f34f53, #ff9b83);
+            transition: width .35s ease;
+        }
+
+        .progress-caption {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: var(--suave);
+            font-size: 12px;
+        }
+
+        .goal-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 11px;
+            margin-top: 20px;
+        }
+
+        .mini-box {
+            background: var(--tarjeta2);
+            border-radius: 12px;
+            padding: 13px;
+        }
+
+        .mini-box small {
+            display: block;
+            color: var(--suave);
+            margin-bottom: 7px;
+        }
+
+        .mini-box strong {
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .notice {
+            color: var(--suave);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        .emergency-hero {
+            background: linear-gradient(120deg, #30252b, #42292d);
+            border: 1px solid var(--borde);
+            border-radius: 20px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 17px;
+        }
+
+        .shield {
+            width: 65px;
+            height: 65px;
+            border-radius: 19px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 98, 95, .15);
+            color: var(--coral-claro);
+            font-size: 31px;
+            border: 1px solid var(--borde);
+        }
+
+        .emergency-content {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(270px, .85fr);
+            gap: 17px;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .field label {
+            display: block;
+            color: #e6d9dd;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .field input, .field select {
+            width: 100%;
+            min-height: 44px;
+            background: #1c181b;
+            border: 1px solid #59434a;
+            border-radius: 10px;
+            padding: 11px 12px;
+            color: var(--texto);
+            outline: none;
+        }
+
+        .field input:focus, .field select:focus {
+            border-color: var(--coral);
+            box-shadow: 0 0 0 3px rgba(255,98,95,.12);
+        }
+
+        .field-help {
+            display: block;
+            color: var(--suave);
+            font-size: 11px;
+            line-height: 1.5;
+            margin-top: 6px;
+        }
+
+        .suggestion {
+            padding: 16px;
+            background: rgba(126,224,176,.08);
+            border: 1px solid rgba(126,224,176,.2);
+            border-radius: 13px;
+            margin-top: 16px;
+        }
+
+        .suggestion strong {
+            color: var(--verde);
+            display: block;
+            font-size: 23px;
+            margin: 8px 0;
+        }
+
+        .suggestion p {
+            color: var(--suave);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .empty {
+            color: var(--suave);
+            font-size: 13px;
+            line-height: 1.7;
+            padding: 12px 0;
+        }
+
+        .footer {
+            border-top: 1px solid var(--borde);
+            color: var(--suave);
+            padding-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .mobile-menu {
+            display: none;
+        }
+
+        @media (max-width: 1050px) {
+            .layout {
+                grid-template-columns: 205px minmax(0, 1fr);
+            }
+
+            .main {
+                padding: 24px;
+            }
+
+            .grid-two, .emergency-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                padding: 15px;
+                border-right: none;
+                border-bottom: 1px solid var(--borde);
+                gap: 13px;
+            }
+
+            .sidebar nav, .side-bottom {
+                display: none;
+            }
+
+            .sidebar.open nav {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: inline-flex;
+            }
+
+            .main {
+                padding: 18px 14px;
+            }
+
+            .topbar {
+                align-items: start;
+            }
+
+            .hero {
+                padding: 23px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .stat {
+                padding: 17px;
+            }
+
+            .emergency-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .goal-info {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <div class="logo">Ahorra+</div>
+            <nav aria-label="Navegación principal">
+        
+        </div>
+
+        <button class="btn mobile-menu" onclick="toggleMenu()">
+            ☰ Menú
+        </button>
+
+        <nav>
+
+            <a class="nav-link" href="/panel">
+                <span>⌂</span> Panel principal
+            </a>
+
+            
+<a href="/estadisticas" class="nav-link">
+    <span>▤</span>
+    <span>Estadísticas e historial</span>
+</a>
+
+
+            <a class="nav-link" href="/panel#registrar">
+                <span>＋</span> Registrar un ahorro
+            </a>
+
+            <a class="nav-link active" href="#progreso">
+                <span>▥</span> Revisar mi progreso
+            </a>
+
+            <a class="nav-link" href="#emergencia">
+                <span>◇</span> Fondo de emergencia
+            </a>
+
+            <a class="nav-link" href="/perfil">
+                <span>⚙</span> Mi perfil
+            </a>
+        </nav>
+
+        <div class="side-bottom">
+            <div class="side-note">
+                Cada pequeño ahorro te acerca a tus objetivos.
+                ¡Seguí avanzando!
+            </div>
+
+            <a class="nav-link" href="/panel">← Volver al panel</a>
+        </div>
+    </aside>
+
+    <main class="main">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Tu espacio financiero</p>
+                <h1>Mis ahorros</h1>
+                <p class="subtitle">
+                    Conocé tu progreso y preparate para los imprevistos.
+                </p>
+            </div>
+
+            <a href="/panel" class="btn">← Volver</a>
+        </header>
+
+        <section class="hero">
+            <h2>Pequeños pasos, grandes logros.</h2>
+            <p>
+                Revisá cómo administrás tu dinero, seguí el avance de tus
+                objetivos y prepará un respaldo para los gastos inesperados.
+            </p>
+            <a href="#progreso" class="btn">Ver mi progreso ↓</a>
+        </section>
+
+        <!-- SECCIÓN 1: PROGRESO -->
+        <section class="section" id="progreso">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">01 · Seguimiento</p>
+                    <h2>Revisar mi progreso</h2>
+                    <p>Una vista general de tus finanzas y de tu meta de ahorro.</p>
+                </div>
+                <span class="pill" id="estadoDatos">Preparando resumen</span>
+            </div>
+
+            <div class="stats">
+                <article class="stat">
+                    <p class="stat-label">Ingresos registrados</p>
+                    <div class="stat-value green" id="totalIngresos">$0.00</div>
+                    <p class="stat-foot">Dinero que ha ingresado</p>
+                </article>
+
+                <article class="stat">
+                    <p class="stat-label">Gastos registrados</p>
+                    <div class="stat-value accent" id="totalGastos">$0.00</div>
+                    <p class="stat-foot">Dinero que has gastado</p>
+                </article>
+
+                <article class="stat">
+                    <p class="stat-label">Balance disponible</p>
+                    <div class="stat-value" id="balanceActual">$0.00</div>
+                    <p class="stat-foot">Ingresos menos gastos</p>
+                </article>
+            </div>
+
+            <div class="grid-two">
+                <article class="card">
+                    <div class="card-heading">
+                        <div>
+                            <h3>Ingresos vs. gastos</h3>
+                            <p>Comparación de tus movimientos por mes.</p>
+                        </div>
+                        <span class="pill">Resumen</span>
+                    </div>
+
+                    <div class="chart-wrap">
+                        <canvas id="graficaProgreso"
+                                aria-label="Gráfica comparativa de ingresos y gastos"
+                                role="img"></canvas>
+                    </div>
+
+                    <div class="legend">
+                        <span><i class="dot"></i> Ingresos</span>
+                        <span><i class="dot gray"></i> Gastos</span>
+                    </div>
+
+                    <p class="notice" id="notaGrafica">
+                        La gráfica se actualizará con tus movimientos registrados.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-heading">
+                        <div>
+                            <h3>Mi meta principal</h3>
+                            <p>Así va tu objetivo de ahorro actual.</p>
+                        </div>
+                        <span class="pill">Mi meta</span>
+                    </div>
+
+                    <p class="stat-label" id="nombreMeta">Mi meta de ahorro</p>
+                    <div class="goal-amount" id="progresoMeta">$0.00</div>
+                    <p class="stat-foot">
+                        de <span id="montoMeta">$0.00</span> establecidos
+                    </p>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" id="barraMeta"></div>
+                    </div>
+
+                    <div class="progress-caption">
+                        <span id="porcentajeMeta">0% completado</span>
+                        <span id="restanteMeta">Faltan $0.00</span>
+                    </div>
+
+                    <div class="goal-info">
+                        <div class="mini-box">
+                            <small>Fecha límite</small>
+                            <strong id="fechaMeta">Sin definir</strong>
+                        </div>
+                        <div class="mini-box">
+                            <small>Estado</small>
+                            <strong id="estadoMeta">En progreso</strong>
+                        </div>
+                    </div>
+
+                    <p class="notice">
+                        El avance se calcula con tu balance actual. No representa
+                        dinero reservado exclusivamente para esta meta.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: FONDO DE EMERGENCIA -->
+        <section class="section" id="emergencia">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">02 · Preparación</p>
+                    <h2>Mi fondo de emergencia</h2>
+                    <p>
+                        Planificá una reserva para gastos inesperados sin
+                        confundirla con tu meta de ahorro principal.
+                    </p>
+                </div>
+                <span class="pill">Plan de respaldo</span>
+            </div>
+
+            <div class="emergency-hero">
+                <div>
+                    <p class="eyebrow">Tu tranquilidad también importa</p>
+                    <h2>Prepararte hoy puede ayudarte mañana.</h2>
+                    <p class="subtitle">
+                        Establecé un objetivo realista y avanzá a tu propio ritmo.
+                    </p>
+                </div>
+                <div class="shield" aria-hidden="true">◇</div>
+            </div>
+
+            <div class="emergency-content">
+                <article class="card">
+                    <div class="card-heading">
+                        <div>
+                            <h3>Configurá tu fondo</h3>
+                            <p>Podés ajustar estos valores para calcular tu plan.</p>
+                        </div>
+                    </div>
+
+                    <form class="form-grid" id="formEmergencia">
+                        <div class="field">
+                            <label for="metaEmergencia">
+                                ¿Cuánto querés reunir? ($)
+                            </label>
+                            <input type="number" id="metaEmergencia"
+                                   min="1" step="0.01" value="500"
+                                   required>
+                        </div>
+
+                        <div class="field">
+                            <label for="ahorradoEmergencia">
+                                ¿Cuánto tenés reservado? ($)
+                            </label>
+                            <input type="number" id="ahorradoEmergencia"
+                                   min="0" step="0.01" value="0"
+                                   required>
+                            <span class="field-help">
+                                Ingresá solamente el dinero que realmente
+                                tenés reservado para emergencias.
+                            </span>
+                        </div>
+
+                        <div class="field">
+                            <label for="mesesEmergencia">
+                                ¿En cuántos meses querés lograrlo?
+                            </label>
+                            <select id="mesesEmergencia">
+                                <option value="3">3 meses</option>
+                                <option value="6" selected>6 meses</option>
+                                <option value="9">9 meses</option>
+                                <option value="12">12 meses</option>
+                                <option value="18">18 meses</option>
+                                <option value="24">24 meses</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary" type="submit">
+                            Calcular mi plan
+                        </button>
+                    </form>
+
+                    <p class="notice" id="mensajeEmergencia" aria-live="polite">
+                        Estos valores son un borrador local; todavía no se
+                        guardan en tu cuenta.
+                    </p>
+                </article>
+
+                <article class="card">
+                    <div class="card-heading">
+                        <div>
+                            <h3>Mi reserva de emergencia</h3>
+                            <p>Resumen de tu objetivo.</p>
+                        </div>
+                        <span class="pill">Mi respaldo</span>
+                    </div>
+
+                    <p class="stat-label">Dinero reservado</p>
+                    <div class="goal-amount" id="reservaActual">$0.00</div>
+                    <p class="stat-foot">
+                        de <span id="reservaObjetivo">$500.00</span>
+                    </p>
+
+                    <div class="progress-track">
+                        <div class="progress-fill" id="barraEmergencia"></div>
+                    </div>
+
+                    <div class="progress-caption">
+                        <span id="porcentajeEmergencia">0% completado</span>
+                        <span id="faltaEmergencia">Faltan $500.00</span>
+                    </div>
+
+                    <div class="goal-info">
+                        <div class="mini-box">
+                            <small>Plazo elegido</small>
+                            <strong id="plazoEmergencia">6 meses</strong>
+                        </div>
+                        <div class="mini-box">
+                            <small>Aporte mensual sugerido</small>
+                            <strong id="aporteMensual">$83.33</strong>
+                        </div>
+                    </div>
+
+                    <div class="suggestion">
+                        <p>Tu próximo paso</p>
+                        <strong id="proximoPaso">$83.33 al mes</strong>
+                        <p id="textoSugerencia">
+                            Esta es una sugerencia matemática, no una obligación.
+                            Ajustala a lo que realmente podés ahorrar.
+                        </p>
+                    </div>
+
+                    <p class="notice">
+                        El fondo de emergencia se mantiene separado de la meta
+                        principal en esta vista. Todavía no se registran
+                        transferencias ni movimientos reales.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <footer class="footer">
+            Ahorra+ · Organizá tu dinero, construí tus metas y avanzá a tu ritmo.
+        </footer>
+
+    </main>
+</div>
+
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const dinero = valor =>
+    new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+    }).format(Number(valor) || 0);
+
+// Conexión con las API de Flask
+async function api(url, metodo = "GET", datos = null) {
+    const opciones = {
+        method: metodo,
+        headers: {
+            "Content-Type": "application/json"
+        },
+        credentials: "same-origin"
+    };
+
+    if (datos !== null) {
+        opciones.body = JSON.stringify(datos);
+    }
+
+    const respuesta = await fetch(url, opciones);
+
+    let resultado = {};
+    try {
+        resultado = await respuesta.json();
+    } catch (_) {
+        resultado = {};
+    }
+
+    if (!respuesta.ok) {
+        throw new Error(
+            resultado.error || "Error al conectar con el servidor."
+        );
+    }
+
+    return resultado;
+}
+
+function toggleMenu() {
+    $("sidebar").classList.toggle("open");
+}
+
+// ===============================
+// GRÁFICA DE INGRESOS Y GASTOS
+// ===============================
+let ultimosIngresos = 0;
+let ultimosGastos = 0;
+
+function dibujarGrafica(ingresos, gastos) {
+    const canvas = $("graficaProgreso");
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0 || rect.height <= 0) return;
+
+    const ratio = window.devicePixelRatio || 1;
+
+    canvas.width = Math.round(rect.width * ratio);
+    canvas.height = Math.round(rect.height * ratio);
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    const w = rect.width;
+    const h = rect.height;
+
+    const izquierda = 48;
+    const derecha = 12;
+    const arriba = 18;
+    const abajo = 35;
+
+    const areaW = w - izquierda - derecha;
+    const areaH = h - arriba - abajo;
+
+    if (areaW <= 0 || areaH <= 0) return;
+
+    const maximo = Math.max(ingresos, gastos, 100);
+    const escala = maximo * 1.15;
+
+    ctx.font = "11px Arial";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+
+    for (let i = 0; i <= 4; i++) {
+        const y = arriba + areaH * i / 4;
+        const valor = escala * (4 - i) / 4;
+
+        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.beginPath();
+        ctx.moveTo(izquierda, y);
+        ctx.lineTo(w - derecha, y);
+        ctx.stroke();
+
+        ctx.fillStyle = "#c7b9bd";
+        ctx.fillText(
+            valor >= 1000
+                ? "$" + (valor / 1000).toFixed(1) + "k"
+                : "$" + Math.round(valor),
+            izquierda - 7,
+            y
+        );
+    }
+
+    const barWidth = Math.min(65, areaW * 0.24);
+    const gap = Math.min(22, areaW * 0.08);
+    const inicio =
+        izquierda + (areaW - (barWidth * 2 + gap)) / 2;
+
+    [
+        {
+            valor: ingresos,
+            x: inicio,
+            color: "#ff625f",
+            etiqueta: "Ingresos"
+        },
+        {
+            valor: gastos,
+            x: inicio + barWidth + gap,
+            color: "#a99ca5",
+            etiqueta: "Gastos"
+        }
+    ].forEach(d => {
+        const alto = Math.max(0, d.valor / escala * areaH);
+        const y = arriba + areaH - alto;
+
+        ctx.fillStyle = d.color;
+        ctx.fillRect(
+            d.x,
+            y,
+            barWidth,
+            Math.max(0, alto)
+        );
+
+        ctx.fillStyle = "#fff8f6";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillText(
+            dinero(d.valor),
+            d.x + barWidth / 2,
+            Math.max(arriba + 12, y - 5)
+        );
+
+        ctx.fillStyle = "#c7b9bd";
+        ctx.textBaseline = "top";
+        ctx.fillText(
+            d.etiqueta,
+            d.x + barWidth / 2,
+            arriba + areaH + 10
+        );
+    });
+}
+
+function actualizarMeta(meta, balance) {
+    const nombre = meta.nombre || "Mi meta de ahorro";
+    const monto = Number(meta.monto) || 0;
+    const disponible = Math.max(0, Number(balance) || 0);
+    const avance = monto > 0
+        ? Math.min(100, disponible / monto * 100)
+        : 0;
+    const restante = Math.max(0, monto - disponible);
+
+    $("nombreMeta").textContent = nombre;
+    $("progresoMeta").textContent = dinero(disponible);
+    $("montoMeta").textContent = dinero(monto);
+    $("barraMeta").style.width = avance + "%";
+    $("porcentajeMeta").textContent =
+        avance.toFixed(1) + "% completado";
+    $("restanteMeta").textContent = "Faltan " + dinero(restante);
+
+    $("fechaMeta").textContent = meta.fecha_limite || "Sin definir";
+    $("estadoMeta").textContent =
+        monto > 0 && disponible >= monto
+            ? "Completada"
+            : "En progreso";
+}
+
+async function mostrarDemostracion() {
+    $("estadoDatos").textContent = "Cargando datos...";
+
+    try {
+        const datos = await api("/api/resumen");
+
+        const ingresos = Number(datos.total_ingresos) || 0;
+        const gastos = Number(datos.total_gastos) || 0;
+        const balance = Number(datos.balance_neto) || 0;
+        const meta = datos.meta || {};
+
+        $("totalIngresos").textContent = dinero(ingresos);
+        $("totalGastos").textContent = dinero(gastos);
+        $("balanceActual").textContent = dinero(balance);
+
+        actualizarMeta(meta, balance);
+
+        ultimosIngresos = ingresos;
+        ultimosGastos = gastos;
+        dibujarGrafica(ingresos, gastos);
+
+        $("estadoDatos").textContent = "Datos reales";
+        $("notaGrafica").textContent =
+            "Comparación de los ingresos y gastos registrados en tu cuenta.";
+    } catch (error) {
+        $("estadoDatos").textContent = "Error de conexión";
+        $("notaGrafica").textContent = error.message;
+        console.error("Error al cargar el resumen:", error);
+    }
+}
+
+// ===============================
+// CÁLCULO DEL FONDO DE EMERGENCIA
+// ===============================
+function calcularEmergencia() {
+    const objetivo = Number($("metaEmergencia").value);
+    const ahorrado = Number($("ahorradoEmergencia").value);
+    const meses = Number($("mesesEmergencia").value);
+
+    if (
+        !Number.isFinite(objetivo) ||
+        !Number.isFinite(ahorrado) ||
+        !Number.isFinite(meses) ||
+        objetivo <= 0 ||
+        ahorrado < 0 ||
+        meses <= 0
+    ) {
+        $("mensajeEmergencia").textContent =
+            "Ingresa un objetivo mayor que cero y un ahorro válido.";
+        return;
+    }
+
+    const restante = Math.max(0, objetivo - ahorrado);
+    const avance = Math.min(100, ahorrado / objetivo * 100);
+    const aporte = restante / meses;
+
+    $("reservaActual").textContent = dinero(ahorrado);
+    $("reservaObjetivo").textContent = dinero(objetivo);
+
+    $("barraEmergencia").style.width = avance + "%";
+    $("porcentajeEmergencia").textContent =
+        avance.toFixed(1) + "% completado";
+
+    $("faltaEmergencia").textContent =
+        restante > 0
+            ? "Faltan " + dinero(restante)
+            : "¡Objetivo alcanzado!";
+
+    $("plazoEmergencia").textContent =
+        meses + (meses === 1 ? " mes" : " meses");
+
+    $("aporteMensual").textContent = dinero(aporte);
+    $("proximoPaso").textContent =
+        restante > 0
+            ? dinero(aporte) + " al mes"
+            : "¡Ya alcanzaste tu objetivo!";
+
+    $("textoSugerencia").textContent =
+        restante > 0
+            ? "Si mantienes este ritmo, podrás reunir lo que te falta en " +
+              meses + (meses === 1 ? " mes." : " meses.")
+            : "Tu fondo ya alcanza el objetivo que estableciste.";
+
+    $("mensajeEmergencia").textContent =
+        "Puedes ajustar los valores y guardar tu plan.";
+}
+
+async function cargarEmergencia() {
+    try {
+        const datos = await api("/api/emergencia");
+
+        $("metaEmergencia").value = datos.monto_objetivo;
+        $("ahorradoEmergencia").value = datos.monto_actual;
+        $("mesesEmergencia").value = datos.meses_objetivo;
+
+        calcularEmergencia();
+    } catch (error) {
+        $("mensajeEmergencia").textContent =
+            "No se pudo cargar el fondo: " + error.message;
+        console.error("Error al cargar el fondo:", error);
+    }
+}
+
+$("formEmergencia").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const monto_objetivo = Number($("metaEmergencia").value);
+    const monto_actual = Number($("ahorradoEmergencia").value);
+    const meses_objetivo = Number($("mesesEmergencia").value);
+
+    if (
+        !Number.isFinite(monto_objetivo) ||
+        !Number.isFinite(monto_actual) ||
+        monto_objetivo <= 0 ||
+        monto_actual < 0 ||
+        monto_actual > monto_objetivo
+    ) {
+        $("mensajeEmergencia").textContent =
+            "Revisa los valores. El ahorro reservado no puede superar el objetivo.";
+        return;
+    }
+
+    try {
+        await api("/api/emergencia", "PUT", {
+            monto_objetivo,
+            monto_actual,
+            meses_objetivo
+        });
+
+        calcularEmergencia();
+        $("mensajeEmergencia").textContent =
+            "¡Fondo de emergencia guardado correctamente en tu cuenta!";
+    } catch (error) {
+        $("mensajeEmergencia").textContent = error.message;
+    }
+});
+
+// Actualizar los cálculos al modificar los valores
+["metaEmergencia", "ahorradoEmergencia", "mesesEmergencia"]
+    .forEach(id => {
+        $(id).addEventListener("input", calcularEmergencia);
+        $(id).addEventListener("change", calcularEmergencia);
+    });
+
+// Redibujar la gráfica si cambia el tamaño de la ventana
+window.addEventListener("resize", () => {
+    dibujarGrafica(ultimosIngresos, ultimosGastos);
+});
+
+// Inicializar la página
+document.addEventListener("DOMContentLoaded", async () => {
+    await Promise.all([
+        mostrarDemostracion(),
+        cargarEmergencia()
+    ]);
+});
+</script>
+
+</body>
+</html>

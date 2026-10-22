@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ahorra+ | Estadísticas e historial</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estadisticas.css') }}">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div><div class="logo">Ahorra+</div>
+            <nav aria-label="Navegación principal">
+    <button class="btn mobile-menu" id="menuBtn" type="button">☰ Menú</button>
+    <nav>
+      <a class="nav-link" href="/panel">⌂ <span>Panel principal</span></a>
+      <a class="nav-link" href="/ahorros#progreso">▥ <span>Mis ahorros</span></a>
+      <a class="nav-link active" href="/estadisticas">▤ <span>Estadísticas e historial</span></a>
+      <a class="nav-link" href="/panel#registrar">＋ <span>Registrar movimiento</span></a>
+      <a class="nav-link" href="/perfil">⚙ <span>Mi perfil</span></a>
+    </nav>
+    <div class="side-bottom"><div class="side-note">Revisá tus movimientos y conocé cómo evoluciona tu dinero.</div><a class="nav-link" href="/panel">← Volver al panel</a></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><p class="eyebrow">Tu espacio financiero</p><h1>Estadísticas e historial</h1><p class="subtitle">Consultá tus ingresos, gastos y movimientos registrados.</p></div><a href="/ahorros" class="btn">← Mis ahorros</a></header>
+    <section class="hero"><p class="eyebrow">Tus datos, en un solo lugar</p><h2>Entendé mejor tus finanzas.</h2><p>Las estadísticas se calculan con los movimientos guardados en tu cuenta. Podés cambiar el período y descargar un reporte en PDF.</p><a class="btn btn-light" href="#historial">Ver historial ↓</a></section>
+    <section class="section" id="estadisticas">
+      <div class="section-heading"><div><p class="eyebrow">01 · Análisis</p><h2>Ingresos vs. gastos por mes</h2><p>Comparación de los movimientos reales de tu cuenta.</p></div><div class="toolbar"><label for="periodo">Período</label><select id="periodo"><option value="6">Últimos 6 meses</option><option value="12">Últimos 12 meses</option></select></div></div>
+      <div class="stats">
+        <article class="stat"><p class="stat-label">Ingresos del período</p><strong class="stat-value green" id="totalIngresos">$0.00</strong></article>
+        <article class="stat"><p class="stat-label">Gastos del período</p><strong class="stat-value coral" id="totalGastos">$0.00</strong></article>
+        <article class="stat"><p class="stat-label">Balance del período</p><strong class="stat-value" id="balance">$0.00</strong></article>
+      </div>
+      <article class="card"><div class="card-heading"><div><h3>Resumen mensual</h3><p id="estadoGrafica" aria-live="polite">Cargando datos…</p></div><span class="pill">MySQL · Datos reales</span></div><div class="chart-wrap"><canvas id="graficaMensual" role="img" aria-label="Gráfica mensual de ingresos y gastos"></canvas></div><div class="legend"><span><i class="dot income"></i> Ingresos</span><span><i class="dot expenses"></i> Gastos</span></div><p class="notice">Si un mes aparece en cero, significa que no hay movimientos registrados para ese mes.</p></article>
+    </section>
+    <section class="section" id="historial">
+      <div class="section-heading"><div><p class="eyebrow">02 · Registro</p><h2>Historial de movimientos</h2><p>Últimos movimientos registrados en tu cuenta.</p></div><div class="toolbar"><label for="filtroTipo">Mostrar</label><select id="filtroTipo"><option value="todos">Todos</option><option value="ingreso">Solo ingresos</option><option value="gasto">Solo gastos</option></select><button class="btn btn-primary" id="pdfBtn" type="button">↓ Descargar reporte PDF</button></div></div>
+      <article class="card"><div id="mensajeHistorial" class="notice" aria-live="polite">Cargando historial…</div><div class="table-scroll"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Descripción</th><th>Categoría</th><th class="numeric">Monto</th></tr></thead><tbody id="filasHistorial"></tbody></table></div></article>
+    </section>
+    <footer class="footer">Ahorra+ · Organizá tu dinero, construí tus metas y avanzá a tu ritmo.</footer>
+  </main>
+</div>
+
+<script>
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+const dinero = valor =>
+    new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD"
+    }).format(Number(valor) || 0);
+
+let mesesActuales = [];
+let movimientos = [];
+
+async function api(url) {
+    const respuesta = await fetch(url, {
+        credentials: "same-origin",
+        headers: { "Accept": "application/json" }
+    });
+
+    const texto = await respuesta.text();
+    let datos;
+
+    try {
+        datos = JSON.parse(texto);
+    } catch {
+        throw new Error("El servidor no devolvió JSON válido.");
+    }
+
+    if (!respuesta.ok) {
+        throw new Error(datos.error || "Error al consultar el servidor.");
+    }
+
+    return datos;
+}
+
+function dibujarGrafica(meses) {
+    const canvas = $("graficaMensual");
+    if (!canvas) return;
+
+    const ancho = canvas.clientWidth;
+    const alto = canvas.clientHeight;
+
+    if (!ancho || !alto) return;
+
+    const escala = window.devicePixelRatio || 1;
+
+    canvas.width = Math.round(ancho * escala);
+    canvas.height = Math.round(alto * escala);
+
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(escala, 0, 0, escala, 0, 0);
+    ctx.clearRect(0, 0, ancho, alto);
+
+    const izquierda = 55;
+    const derecha = 12;
+    const arriba = 18;
+    const abajo = 48;
+
+    const areaW = ancho - izquierda - derecha;
+    const areaH = alto - arriba - abajo;
+
+    if (areaW <= 0 || areaH <= 0) return;
+
+    const maximo = Math.max(
+        1,
+        ...meses.flatMap(m => [
+            Number(m.ingresos) || 0,
+            Number(m.gastos) || 0
+        ])
+    );
+
+    const limite = maximo * 1.2;
+
+    ctx.font = "11px Arial";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+
+    for (let i = 0; i <= 4; i++) {
+        const y = arriba + areaH * i / 4;
+        const valor = limite * (4 - i) / 4;
+
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.beginPath();
+        ctx.moveTo(izquierda, y);
+        ctx.lineTo(ancho - derecha, y);
+        ctx.stroke();
+
+        ctx.fillStyle = "#c7b9bd";
+        ctx.fillText(dinero(valor), izquierda - 7, y);
+    }
+
+    const anchoGrupo = areaW / Math.max(meses.length, 1);
+    const anchoBarra = Math.max(
+        4,
+        Math.min(22, anchoGrupo * 0.26)
+    );
+
+    meses.forEach((mes, i) => {
+        const centro = izquierda + anchoGrupo * (i + 0.5);
+
+        const barras = [
+            {
+                valor: Number(mes.ingresos) || 0,
+                x: centro - anchoBarra - 2,
+                color: "#ff625f"
+            },
+            {
+                valor: Number(mes.gastos) || 0,
+                x: centro + 2,
+                color: "#a99ca5"
+            }
+        ];
+
+        barras.forEach(barra => {
+            const altura = barra.valor / limite * areaH;
+            const y = arriba + areaH - altura;
+
+            ctx.fillStyle = barra.color;
+            ctx.fillRect(
+                barra.x,
+                y,
+                anchoBarra,
+                Math.max(0, altura)
+            );
+        });
+
+        ctx.fillStyle = "#c7b9bd";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        ctx.fillText(
+            (mes.etiqueta || mes.mes).split(" ")[0].slice(0, 3),
+            centro,
+            arriba + areaH + 8
+        );
+    });
+}
+
+async function cargarEstadisticas() {
+    const estado = $("estadoGrafica");
+    estado.textContent = "Cargando datos…";
+
+    try {
+        const periodo = Number($("periodo").value);
+        const datos = await api(
+            "/api/resumen-mensual?meses=" + periodo
+        );
+
+        mesesActuales = datos.meses || [];
+
+        const ingresos = mesesActuales.reduce(
+            (suma, mes) => suma + (Number(mes.ingresos) || 0), 0
+        );
+
+        const gastos = mesesActuales.reduce(
+            (suma, mes) => suma + (Number(mes.gastos) || 0), 0
+        );
+
+        $("totalIngresos").textContent = dinero(ingresos);
+        $("totalGastos").textContent = dinero(gastos);
+        $("balance").textContent = dinero(ingresos - gastos);
+
+        dibujarGrafica(mesesActuales);
+
+        estado.textContent =
+            "Mostrando " + periodo + " meses de movimientos registrados.";
+    } catch (error) {
+        estado.textContent = "Error en la gráfica: " + error.message;
+    }
+}
+
+function renderHistorial() {
+    const tbody = $("filasHistorial");
+    const mensaje = $("mensajeHistorial");
+    tbody.replaceChildren();
+
+    const filtro = $("filtroTipo").value;
+
+    const lista = movimientos.filter(movimiento =>
+        filtro === "todos" || movimiento.tipo === filtro
+    );
+
+    if (!lista.length) {
+        mensaje.textContent =
+            "No hay movimientos registrados para este filtro.";
+        return;
+    }
+
+    mensaje.textContent = "Se muestran " + lista.length + " movimiento(s).";
+
+    lista.forEach(movimiento => {
+        const fila = document.createElement("tr");
+
+        const valores = [
+            movimiento.fecha || "—",
+            movimiento.tipo === "ingreso" ? "Ingreso" : "Gasto",
+            movimiento.descripcion || "Movimiento",
+            movimiento.categoria || "—"
+        ];
+
+        valores.forEach((valor, indice) => {
+            const celda = document.createElement("td");
+            celda.textContent = valor;
+
+            if (indice === 1) {
+                celda.className =
+                    movimiento.tipo === "ingreso" ? "green" : "coral";
+            }
+
+            fila.appendChild(celda);
+        });
+
+        const monto = document.createElement("td");
+        monto.className =
+            "numeric " +
+            (movimiento.tipo === "ingreso" ? "green" : "coral");
+
+        monto.textContent =
+            (movimiento.tipo === "ingreso" ? "+" : "−") +
+            dinero(movimiento.cantidad);
+
+        fila.appendChild(monto);
+        tbody.appendChild(fila);
+    });
+}
+
+async function cargarHistorial() {
+    const mensaje = $("mensajeHistorial");
+    mensaje.textContent = "Cargando historial…";
+
+    try {
+        const datos = await api("/api/movimientos");
+
+        if (!Array.isArray(datos)) {
+            throw new Error("El historial no tiene el formato esperado.");
+        }
+
+        movimientos = datos;
+        renderHistorial();
+    } catch (error) {
+        mensaje.textContent = "Error en el historial: " + error.message;
+    }
+}
+
+$("periodo").addEventListener("change", cargarEstadisticas);
+$("filtroTipo").addEventListener("change", renderHistorial);
+
+$("pdfBtn").addEventListener("click", () => {
+    window.location.href = "/api/reporte-pdf";
+});
+
+$("menuBtn").addEventListener("click", () => {
+    $("sidebar").classList.toggle("open");
+});
+
+window.addEventListener("resize", () => {
+    dibujarGrafica(mesesActuales);
+});
+
+cargarEstadisticas();
+cargarHistorial();
+</script>
+
+</body></html>

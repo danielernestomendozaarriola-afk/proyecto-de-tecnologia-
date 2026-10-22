@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrarse</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <div class="login">
+        <h1>Crear Cuenta</h1>
+        <form id="regForm">
+            <label>Nombre completo</label>
+            <input type="text" placeholder="Ingrese su nombre" id="regNombre" required>
+            <label>Correo electrónico</label>
+            <input type="email" placeholder="Ingrese su correo" id="regCorreo" required>
+            <label>Usuario</label>
+            <input type="text" placeholder="Ingrese un usuario" id="regUsuario" required>
+            <label>Contraseña</label>
+            <input type="password" placeholder="Ingrese una contraseña" id="regPass" required>
+            <label>Confirmar contraseña</label>
+            <input type="password" placeholder="Repita la contraseña" id="regPassConfirm" required>
+            <button type="submit">Registrarse</button>
+        </form>
+        <p>¿Ya tienes una cuenta? <a href="/login">Iniciar sesión</a></p>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+
+        document.getElementById("regForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            const v = id => document.getElementById(id).value;
+            if (v("regPass") !== v("regPassConfirm")) { alert("Las contraseñas no coinciden."); return; }
+            try {
+                await api("/api/registro", "POST", { nombre: v("regNombre"), correo: v("regCorreo"),
+                    usuario: v("regUsuario"), password: v("regPass") });
+                alert("¡Cuenta creada! Ahora inicia sesión.");
+                location.href = "/login";
+            } catch (err) { alert(err.message); }
+        });
+    </script>
+</body>
+</html>

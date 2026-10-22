@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel | Ahorra+</title>
+    <link rel="stylesheet" href="/static/css/panel.css">
+</head>
+<body>
+    <button class="menu-btn" type="button" aria-label="Abrir menú" aria-controls="menu" aria-expanded="false" onclick="abrirMenu()">☰</button>
+    <div class="fondo" aria-hidden="true" onclick="cerrarMenu()"></div>
+
+    <div class="contenedor">
+        <aside class="menu" id="menu">
+            <div class="logo">Ahorra+</div>
+            <nav aria-label="Navegación principal">
+                <a href="/inicio">Inicio</a>
+                <a href="/panel" class="activo" aria-current="page">Panel de control</a>
+                <a href="/perfil">Perfil</a>
+                
+<a href="/estadisticas" class="nav-link">
+    <span>▤</span>
+    <span>Estadísticas e historial</span>
+</a>
+
+            </nav>
+            <div class="pro">
+                <p>Avanza poco a poco</p>
+                <strong>Tu futuro empieza hoy</strong>
+            </div>
+            <a href="#" class="salir" id="btnCerrarSesion">↪ Cerrar sesión</a>
+        </aside>
+
+        <main class="contenido">
+            <header class="cabecera">
+                <div>
+                    <p class="saludo">RESUMEN PERSONAL</p>
+                    <h1 id="saludoUsuario">Mis finanzas</h1>
+                </div>
+                <p class="fecha">Tu progreso financiero</p>
+            </header>
+
+            <section class="parte-superior">
+                <div class="tarjeta-contenedor">
+                    <div class="pestanas">
+                        <span class="seleccionado" id="tabMeta" style="cursor:pointer">Mi meta principal</span>
+                        <span id="tabPlan" style="cursor:pointer">Registrar movimiento</span>
+                    </div>
+
+                    <div id="vistaMeta">
+                        <div class="tarjeta tarjeta-ahorro">
+                            <span class="etiqueta-meta">META DE AHORRO</span>
+                            <p class="nombre-meta" id="nombreMeta">—</p> <label for="fechaLimiteMeta">Fecha límite:</label>
+<input
+    type="date"
+    id="fechaLimiteMeta"
+    style="padding: 8px; border: 1px solid #ccc; border-radius: 8px;"
+>
+                            <p class="numero-meta"><span id="saldoMeta" style="color:inherit;font-size:inherit;font-weight:inherit">$0</span> <span>de <span id="montoMeta">$0</span></span></p>
+                            <div class="barra-progreso" role="progressbar" aria-label="Progreso de la meta" aria-valuemin="0" aria-valuemax="100">
+                                <span id="barraFill" style="width:0%"></span>
+                            </div>
+                            <p class="porcentaje-meta" id="porcentajeMeta">0% completado</p>
+                        </div>
+                        <div class="datos">
+                            <div><span>Total ingresado</span><strong id="datoIngresos">$0</strong></div>
+                            <div><span>Total gastado</span><strong id="datoGastos">$0</strong></div>
+                            <div><span>Saldo disponible</span><strong id="datoSaldo">$0</strong></div>
+                            <div><span>Meta restante</span><strong id="datoRestante">$0</strong></div>
+                        </div>
+                        <button type="button" class="btn-panel" id="btnMeta">Cambiar meta</button>
+                    </div>
+
+                    <div id="vistaPlan" style="display:none">
+                        <form id="formMov" class="form-mov">
+                            <select id="movTipo"><option value="ingreso">Ingreso</option><option value="gasto">Gasto</option></select>
+                            <input type="text" id="movDesc" placeholder="Descripción" maxlength="100" required>
+                            <select id="movCategoria" style="display:none">
+                                <option value="alimentacion">Alimentación</option>
+                                <option value="transporte">Transporte</option>
+                                <option value="educacion">Educación</option>
+                                <option value="entretenimiento">Entretenimiento</option>
+                                <option value="otros">Otros</option>
+                            </select>
+                            <input type="number" id="movMonto" placeholder="Monto" min="0.01" step="0.01" required>
+                            <input type="date" id="movFecha" required>
+                            <button type="submit" class="btn-panel">Guardar movimiento</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="perfil perfil-ahorro">
+                    <div class="icono-perfil" aria-hidden="true">✦</div>
+                    <div>
+                        <small>¡Vas por buen camino!</small>
+                        <h2>Cada aporte cuenta</h2>
+                    </div>
+                    <div class="mini-datos">
+                        <div><span>Ingresos</span><strong id="miniIngresos">$0</strong></div>
+                        <div><span>Gastos</span><strong id="miniGastos">$0</strong></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="parte-inferior">
+                <div class="transacciones" id="transacciones">
+                    <div class="titulo-seccion"><h2>Movimientos</h2></div>
+                    <div class="tabla" id="tablaMov">
+                        <div class="fila encabezado"><span>Movimiento</span><span>Fecha / categoría</span><span>Monto</span><span></span></div>
+                    </div>
+                </div>
+
+                <aside class="money">
+                    <h2>Gastos por categoría</h2>
+                    <div class="grafico" id="graficoCircular" role="img" aria-label="Gastos por categoría">
+                        <div class="circulo-centro" id="centroGrafico">$0</div>
+                    </div>
+                    <div class="leyenda" id="leyenda"></div>
+                </aside>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+        const $ = id => document.getElementById(id);
+        const money = n => (n < 0 ? "-$" : "$") + Math.abs(n).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const COLORES = { alimentacion: "#a855f7", transporte: "#c084fc", educacion: "#7e22ce", entretenimiento: "#e879f9", otros: "#6b21a8" };
+        let meta = { nombre: "", monto: 0 };
+
+        function el(tag, texto, clase) {
+            const e = document.createElement(tag);
+            if (texto !== undefined) e.textContent = texto;
+            if (clase) e.className = clase;
+            return e;
+        }
+
+       
+async function cargar() {
+    const [r, movs] = await Promise.all([
+        api("/api/resumen"),
+        api("/api/movimientos")
+    ]);
+
+    meta = r.meta;
+
+    // Recuperar la fecha límite guardada en MySQL
+    $("fechaLimiteMeta").value = meta.fecha_limite || "";
+
+    const saldo = r.balance_neto;
+    const pct = meta.monto > 0
+        ? Math.min(100, Math.max(0, Math.round(saldo / meta.monto * 100)))
+        : 0;
+
+    // Aquí continúa el resto de tu función cargar()
+
+            $("saludoUsuario").textContent = "Finanzas de " + r.nombre;
+            $("nombreMeta").textContent = meta.nombre;
+            $("saldoMeta").textContent = money(saldo);
+            $("montoMeta").textContent = money(meta.monto);
+            $("barraFill").style.width = pct + "%";
+            $("porcentajeMeta").textContent = pct + "% completado";
+            $("datoIngresos").textContent = $("miniIngresos").textContent = money(r.total_ingresos);
+            $("datoGastos").textContent = $("miniGastos").textContent = money(r.total_gastos);
+            $("datoSaldo").textContent = money(saldo);
+            $("datoRestante").textContent = money(Math.max(0, meta.monto - saldo));
+
+            // Tabla de movimientos
+            const tabla = $("tablaMov");
+            tabla.querySelectorAll(".fila:not(.encabezado)").forEach(f => f.remove());
+            if (!movs.length) {
+                tabla.appendChild(el("div", "Aún no tienes movimientos. Registra tu primer ingreso o gasto.", "fila"));
+            }
+            movs.forEach(m => {
+                const f = el("div", undefined, "fila");
+                f.appendChild(el("span", m.descripcion));
+                f.appendChild(el("span", m.fecha + (m.categoria ? " · " + m.categoria : "")));
+                f.appendChild(el("strong", (m.tipo === "ingreso" ? "+" : "-") + money(m.cantidad),
+                    m.tipo === "ingreso" ? "monto-positivo" : "monto-negativo"));
+                const b = el("button", "✕", "btn-borrar");
+                b.title = "Eliminar";
+                b.onclick = async () => {
+                    if (!confirm("¿Eliminar este movimiento?")) return;
+                    await api(`/api/${m.tipo === "ingreso" ? "ingresos" : "gastos"}/${m.id}`, "DELETE");
+                    cargar();
+                };
+                f.appendChild(b);
+                tabla.appendChild(f);
+            });
+
+            // Gráfico por categoría
+            const cats = Object.entries(r.por_categoria);
+            const total = cats.reduce((s, [, v]) => s + v, 0);
+            $("centroGrafico").textContent = money(total);
+            $("leyenda").replaceChildren();
+            if (!total) {
+                $("graficoCircular").style.background = "#2e1065";
+            } else {
+                let acum = 0;
+                const tramos = cats.map(([c, v]) => {
+                    const ini = acum; acum += v / total * 360;
+                    return `${COLORES[c]} ${ini}deg ${acum}deg`;
+                });
+                $("graficoCircular").style.background = `conic-gradient(${tramos.join(",")})`;
+                cats.forEach(([c, v]) => {
+                    const s = el("span", "● " + c + " " + money(v));
+                    s.style.color = COLORES[c];
+                    $("leyenda").appendChild(s);
+                });
+            }
+        }
+
+        function mostrarTab(plan) {
+            $("tabPlan").classList.toggle("seleccionado", plan);
+            $("tabMeta").classList.toggle("seleccionado", !plan);
+            $("vistaPlan").style.display = plan ? "block" : "none";
+            $("vistaMeta").style.display = plan ? "none" : "block";
+        }
+        $("tabMeta").onclick = () => mostrarTab(false);
+        $("tabPlan").onclick = () => mostrarTab(true);
+        
+$("fechaLimiteMeta").addEventListener("change", async function () {
+    try {
+        await api("/api/meta", "PUT", {
+            nombre: meta.nombre,
+            monto: meta.monto,
+            fecha_limite: this.value || null
+        });
+
+        // Confirmar que la fecha quedó guardada
+        await cargar();
+
+    } catch (err) {
+        alert("No se pudo guardar la fecha: " + err.message);
+    }
+});
+
+        $("movTipo").onchange = e => $("movCategoria").style.display = e.target.value === "gasto" ? "" : "none";
+        $("movFecha").value = new Date().toISOString().slice(0, 10);
+
+        $("formMov").addEventListener("submit", async e => {
+            e.preventDefault();
+            const tipo = $("movTipo").value;
+            try {
+                await api(tipo === "ingreso" ? "/api/ingresos" : "/api/gastos", "POST", {
+                    descripcion: $("movDesc").value.trim(), monto: $("movMonto").value,
+                    categoria: $("movCategoria").value, fecha: $("movFecha").value
+                });
+                $("movDesc").value = ""; $("movMonto").value = "";
+                await cargar();
+                mostrarTab(false);
+            } catch (err) { alert(err.message); }
+        });
+
+       
+
+$("btnMeta").onclick = async () => {
+    const nombre = prompt("Nombre de tu meta:", meta.nombre);
+    if (nombre === null) return;
+
+    const monto = prompt("Monto de la meta ($):", meta.monto);
+    if (monto === null) return;
+
+    const fechaInput = $("fechaLimiteMeta");
+    const fecha_limite = fechaInput ? fechaInput.value : "";
+
+    try {
+        await api("/api/meta", "PUT", {
+            nombre,
+            monto,
+            fecha_limite: fecha_limite || null
+        });
+
+        await cargar();
+        alert("¡Meta guardada correctamente!");
+    } catch (err) {
+        alert(err.message);
+    }
+};
+
+
+       if (location.hash === "#registrar") {
+    mostrarTab(true);
+    $("movTipo").value = "ingreso";
+    $("movCategoria").style.display = "none";
+
+    setTimeout(() => {
+        $("movDesc").focus();
+    }, 100);
+}
+
+cargar().catch(err => alert(err.message));
+    </script>
+</body>
+</html>

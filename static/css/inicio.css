@@ -1,0 +1,262 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #090312;
+    color: #e2e8f0;
+}
+
+.menu {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1000;
+    display: flex;
+    width: 210px;
+    height: 100vh;
+    flex-direction: column;
+    padding: 25px 18px;
+    background: #130a0a;
+    color: white;
+    border-right: 1px solid #7f1d1d;
+}
+
+.logo {
+    margin-bottom: 45px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fca5a5;
+}
+
+.menu nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.menu nav a,
+.salir {
+    color: #f87171;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.menu nav a {
+    padding: 11px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.menu nav a:hover,
+.menu nav .activo {
+    transform: translateX(5px);
+    background: #7f1d1d;
+    color: #fee2e2;
+}
+
+.pro {
+    margin: auto 0 25px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #1a0b0b;
+    color: #e2e8f0;
+    font-size: 10px;
+    border: 1px solid #991b1b;
+}
+
+.pro strong {
+    font-size: 12px;
+    color: #f87171;
+}
+
+.salir {
+    font-size: 12px;
+}
+
+.salir:hover {
+    color: white;
+}
+
+.contenedor {
+    max-width: 1100px;
+    min-height: 100vh;
+    margin: 0 auto 0 210px;
+    padding: 2rem;
+    border-radius: 16px;
+    background: #0f0505;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.15);
+}
+
+.bienvenida {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #7f1d1d, #dc2626);
+    color: white;
+}
+
+.bienvenida h1 {
+    margin-bottom: 10px;
+}
+
+.btn {
+    margin-top: 1rem;
+    padding: 10px 20px;
+    border: 0;
+    border-radius: 8px;
+    background: white;
+    color: #991b1b;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.btn:hover {
+    transform: scale(1.05);
+    background: #fee2e2;
+}
+
+h3 {
+    margin: 1.5rem 0 1rem;
+    color: #fff1f2;
+}
+
+.subtitulo-acciones {
+    margin: -0.5rem 0 1rem;
+    color: #f87171;
+    font-size: 0.95rem;
+}
+
+.fila-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 1rem;
+}
+
+.tarjeta-ahorro {
+    display: flex;
+    min-height: 170px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem;
+    border: 1px solid #7f1d1d;
+    background: #130a0a;
+    color: #fff1f2;
+    border-radius: 14px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.tarjeta-ahorro:hover {
+    transform: translateY(-4px);
+    border-color: #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.tarjeta-ahorro strong {
+    font-size: 0.95rem;
+    line-height: 1.35;
+}
+
+.icono-ahorro {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border-radius: 16px;
+    background: #450a0a;
+    color: #f87171;
+}
+
+.icono-ahorro svg {
+    width: 34px;
+    height: 34px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.lado-derecho {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.tarjeta-lateral {
+    padding: 1.2rem;
+    border-radius: 10px;
+    background: #130a0a;
+    border: 1px solid #7f1d1d;
+    color: #fff1f2;
+    transition: 0.3s;
+}
+
+.tarjeta-lateral:hover {
+    transform: translateY(-4px);
+    border-color: #ef4444;
+}
+
+.menu-btn {
+    display: none;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1100;
+    padding: 10px 13px;
+    border: 0;
+    border-radius: 8px;
+    background: #130a0a;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    border: 1px solid #7f1d1d;
+}
+
+.fondo {
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .menu {
+        width: 230px;
+        transform: translateX(-100%);
+        transition: 0.3s;
+    }
+    .menu.mostrar {
+        transform: translateX(0);
+    }
+    .menu-btn {
+        display: block;
+    }
+    .fondo {
+        position: fixed;
+        inset: 0;
+        z-index: 900;
+        background: rgba(0, 0, 0, 0.7);
+    }
+    .fondo.mostrar {
+        display: block;
+    }
+    .contenedor {
+        width: 100%;
+        margin: 0;
+        padding: 70px 15px 20px;
+        border-radius: 0;
+    }
+    .lado-derecho {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <div class="login">
+        <h1>Iniciar Sesión</h1>
+        <form id="loginForm">
+            <label>Usuario</label>
+            <input type="text" placeholder="Ingrese su usuario" id="inputUsuario" required>
+            <label>Contraseña</label>
+            <input type="password" placeholder="Ingrese su contraseña" id="inputPass" required>
+            <button type="submit">Ingresar</button>
+        </form>
+
+        <p>¿No tienes una cuenta? <a href="/registro">Registrarse</a></p>
+        <p><a href="#" id="btnAbrirModal">¿Olvidaste tu contraseña?</a></p>
+    </div>
+
+    <!-- VENTANA DESPLEGABLE TIPO TELÉFONO -->
+    <div class="modal-overlay" id="modalRestaurar">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>Restaurar Contraseña</h2>
+                <button type="button" class="btn-cerrar" id="btnCerrarModal">&times;</button>
+            </div>
+            <form id="formRestaurar">
+                <label>Correo Gmail</label>
+                <input type="email" placeholder="Ingrese su correo registrado" id="restaurarCorreo" required>
+                
+                <label>Nueva Contraseña</label>
+                <input type="password" placeholder="Ingrese su nueva contraseña" id="restaurarPass" required>
+                
+                <button type="submit">Actualizar Contraseña</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+
+        const modal = document.getElementById("modalRestaurar");
+        document.getElementById("btnAbrirModal").addEventListener("click", e => { e.preventDefault(); modal.classList.add("activo"); });
+        document.getElementById("btnCerrarModal").addEventListener("click", () => modal.classList.remove("activo"));
+        modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("activo"); });
+
+        document.getElementById("formRestaurar").addEventListener("submit", async e => {
+            e.preventDefault();
+            try {
+                await api("/api/restaurar", "POST", {
+                    correo: document.getElementById("restaurarCorreo").value,
+                    password: document.getElementById("restaurarPass").value });
+                alert("¡Contraseña actualizada! Ya puedes iniciar sesión.");
+                modal.classList.remove("activo");
+                e.target.reset();
+            } catch (err) { alert(err.message); }
+        });
+
+        document.getElementById("loginForm").addEventListener("submit", async e => {
+            e.preventDefault();
+            try {
+                await api("/api/login", "POST", {
+                    usuario: document.getElementById("inputUsuario").value,
+                    password: document.getElementById("inputPass").value });
+                location.href = "/inicio";
+            } catch (err) { alert(err.message); }
+        });
+    </script>
+</body>
+</html>

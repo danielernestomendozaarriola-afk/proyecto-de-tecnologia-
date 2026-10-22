@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfil | Ahorra+</title>
+    <link rel="stylesheet" href="/static/css/inicio.css">
+    <link rel="stylesheet" href="/static/css/perfil.css">
+</head>
+<body>
+    <button class="menu-btn" type="button" aria-label="Abrir menú"
+        aria-controls="menu" aria-expanded="false" onclick="abrirMenu()">☰</button>
+    <div class="fondo" aria-hidden="true" onclick="cerrarMenu()"></div>
+
+    <div class="contenedor">
+        <aside class="menu" id="menu">
+            <div class="logo">Ahorra+</div>
+            <nav aria-label="Navegación principal">
+                <a href="/inicio">Inicio</a>
+                <a href="/panel">Panel de control</a>
+                <a href="/panel#transacciones">Mis ahorros</a>
+                <a href="/perfil" class="activo" aria-current="page">Perfil</a>
+                
+<a href="/estadisticas" class="nav-link">
+    <span>▤</span>
+    <span>Estadísticas e historial</span>
+</a>
+
+            </nav>
+
+            <div class="pro">
+                <p>Organiza tus metas y avances</p>
+                <strong>Tu futuro empieza hoy</strong>
+            </div>
+
+            <a href="#" class="salir" id="btnCerrarSesion">↪ Cerrar sesión</a>
+        </aside>
+
+        <main class="perfil">
+            <!-- Círculo interactivo para cambiar la foto -->
+            <div class="foto" role="img" aria-label="Foto de perfil" id="contenedorAvatar" title="Haz clic para subir o cambiar foto">
+                <span id="avatarIniciales">Foto</span>
+                <input type="file" id="inputFoto" accept="image/*" style="display: none;">
+            </div>
+
+            <h1 id="perfilNombreHeader">Usuario</h1>
+            <p class="usuario" id="perfilUsuarioHeader">@usuario</p>
+            <p class="descripcion" id="perfilDescripcion">
+                Estudiante de desarrollo de software. Me gusta aprender
+                sobre tecnología, diseño y programación.
+            </p>
+
+            <section class="datos" id="datos" aria-label="Datos del perfil">
+                <div>
+                    <h2>Nombre</h2>
+                    <p id="perfilNombre">Usuario</p>
+                </div>
+                <div>
+                    <h2>Correo</h2>
+                    <p id="perfilCorreo">usuario@gmail.com</p>
+                </div>
+                <div>
+                    <h2>Usuario</h2>
+                    <p id="perfilUsuario">@usuario</p>
+                </div>
+            </section>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 1rem;">
+                <button type="button" id="btnSubirFoto">Subir foto</button>
+                <button type="button" id="btnEditarPerfil">Editar perfil</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- VENTANA MODAL PARA EDITAR PERFIL -->
+    <div class="modal-overlay" id="modalEditar">
+        <div class="modal-contenido">
+            <div class="modal-header">
+                <h2>Editar Perfil</h2>
+                <button type="button" class="btn-cerrar" id="btnCerrarModal">&times;</button>
+            </div>
+            <form id="formEditarPerfil">
+                <label>Nombre completo</label>
+                <input type="text" id="editNombre" required>
+                
+                <label>Correo electrónico</label>
+                <input type="email" id="editCorreo" required>
+
+                <label>Descripción</label>
+                <input type="text" id="editDescripcion" required>
+                
+                <button type="submit">Guardar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/js/api.js"></script>
+    <script>
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const $ = id => document.getElementById(id);
+            const avatar = $("contenedorAvatar"), modal = $("modalEditar");
+            let p = await api("/api/perfil");
+
+            function pintar() {
+                $("perfilNombreHeader").textContent = $("perfilNombre").textContent = p.nombre;
+                $("perfilUsuarioHeader").textContent = $("perfilUsuario").textContent = "@" + p.usuario;
+                $("perfilCorreo").textContent = p.correo;
+                $("perfilDescripcion").textContent = p.descripcion || "";
+                if (p.foto) {
+                    avatar.style.backgroundImage = `url(${p.foto})`;
+                    avatar.style.backgroundSize = "cover";
+                    avatar.style.backgroundPosition = "center";
+                    $("avatarIniciales").style.display = "none";
+                } else {
+                    avatar.style.backgroundImage = "none";
+                    $("avatarIniciales").style.display = "block";
+                    $("avatarIniciales").textContent = p.nombre.charAt(0).toUpperCase();
+                }
+            }
+            pintar();
+
+            avatar.addEventListener("click", () => $("inputFoto").click());
+            $("btnSubirFoto").addEventListener("click", () => $("inputFoto").click());
+            $("inputFoto").addEventListener("change", e => {
+                const f = e.target.files[0];
+                if (!f) return;
+                if (f.size > 3 * 1024 * 1024) { alert("La foto debe pesar menos de 3 MB."); return; }
+                const r = new FileReader();
+                r.onload = async ev => {
+                    try { await api("/api/perfil", "PUT", { foto: ev.target.result }); p.foto = ev.target.result; pintar(); }
+                    catch (err) { alert(err.message); }
+                };
+                r.readAsDataURL(f);
+            });
+
+            $("btnEditarPerfil").addEventListener("click", () => {
+                $("editNombre").value = p.nombre;
+                $("editCorreo").value = p.correo;
+                $("editDescripcion").value = p.descripcion || "";
+                modal.classList.add("activo");
+            });
+            $("btnCerrarModal").addEventListener("click", () => modal.classList.remove("activo"));
+            modal.addEventListener("click", e => { if (e.target === modal) modal.classList.remove("activo"); });
+
+            $("formEditarPerfil").addEventListener("submit", async e => {
+                e.preventDefault();
+                const nuevo = { nombre: $("editNombre").value.trim(), correo: $("editCorreo").value.trim(),
+                                descripcion: $("editDescripcion").value.trim() };
+                try {
+                    await api("/api/perfil", "PUT", nuevo);
+                    Object.assign(p, nuevo); pintar();
+                    modal.classList.remove("activo");
+                    alert("¡Perfil actualizado con éxito!");
+                } catch (err) { alert(err.message); }
+            });
+        });
+    </script>
+</body>
+</html>
